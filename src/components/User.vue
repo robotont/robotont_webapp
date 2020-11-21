@@ -1,17 +1,123 @@
-var app = new Vue({
-    el: "#app",
+<template>
+    <div id='user' class="container">
+        <div class="jumbotron">
+            <h1>Robotont</h1>
+        </div>
+
+        <div class="row" style="max-height: 200px;">
+            <div class="col-md-6">
+                <h3>Connection status</h3>
+
+                <p class="text-success" v-if="connected">Connected!</p>
+                <p class="text-danger" v-if="!connected">Not connected!</p>
+
+                <label>Websockect server address</label>
+                <input type="text" v-model="ws_address" />
+                <br />
+
+                <button @click="disconnect" class="btn btn-danger" v-if="connected">Disconnect</button>
+                <button @click="connect" class="btn btn-success" v-else>Connect</button>
+            </div>
+
+            <div class="col-md-6">
+                <h3>Log messages: </h3>
+                <div style="max-height: 170px; overflow: auto;">
+                    <p v-for="log in logs" v-bind:key="log">
+                        {{ log }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <h5>Commands</h5>
+            </div>
+
+            <div class="col-md-12 text-center">
+                <button @click="forward" :disabled="loading || !connected" class="btn btn-primary">Go forward</button>
+                <br><br>
+            </div>
+
+            <div class="col-md-4 text-center">
+                <button @click="turnLeft" :disabled="loading || !connected" class="btn btn-primary">Left</button>
+            </div>
+
+            <div class="col-md-4 text-center">
+                <button @click="stop" :disabled="loading || !connected" class="btn btn-danger">Stop</button>
+                <br><br>
+            </div>
+
+            <div class="col-md-4 text-center">
+                <button @click="turnRight" :disabled="loading || !connected" class="btn btn-primary">Right</button>         
+            </div>
+
+            <div class="col-md-12 text-center">
+                <button @click="backward" :disabled="loading || !connected" class="btn btn-primary">Go backward</button>
+                <br><br>
+            </div>
+        </div>
+        
+
+        <div class="col-md-12 text-center">
+            <h5>Joystick</h5>
+        </div>
+        <br><br><br><br>
+
+        <div id="joystick_zone" style="position: relative;"></div>
+        <br><br><br><br>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Topics: </h3>
+                <div style="max-height: 400px; max-width: 500px; overflow: auto;">
+                    <p v-for="t in topics[0]" v-bind:key="t">
+                        {{ t }}
+                    </p>
+                </div>
+                <button @click="getTopics" :disabled="loading || !connected" class="btn btn-info">Show topics</button>
+            </div>
+            
+            <div class="col-md-4">
+                <h3>Nodes: </h3>
+                <div style="max-height: 400px; max-width: 500px; overflow: auto;">
+                    <p v-for="n in nodes[0]" v-bind:key="n">
+                        {{ n }}
+                    </p>
+                </div>
+                <button @click="getNodes" :disabled="loading || !connected" class="btn btn-info">Show nodes</button>
+            </div>
+        </div>
+        <br><br><br><br>
+    </div>
+</template>
+
+<script>
+import ROSLIB from 'roslib';
+import nipplejs from 'nipplejs';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+export default {
+    name: "User",
 
     //lehekülje staatuse salvestamine
-    data: {
-        connected: false,
-        ros: null,
-        ws_address: "192.168.1.165:9090",
-        logs: [],
-        loading: false,
-        topic: null,
-        message: null,
-        topics: [],
-        nodes:  [],
+    data: function () {
+        return {
+            connected: false,
+            ros: null,
+            ws_address: "192.168.1.165:9090",
+            logs: [],
+            loading: false,
+            topic: null,
+            message: null,
+            topics: [],
+            nodes:  [],
+            manager: null
+        }
     },
 
     methods: {
@@ -98,6 +204,7 @@ var app = new Vue({
             this.setTopic();
             this.topic.publish(this.message);
         },
+
         joystick: function () {
             var options = {
                 zone: document.getElementById("joystick_zone"),
@@ -108,21 +215,21 @@ var app = new Vue({
                 color: "#000000",
             };
             var ref = this;
-            manager = nipplejs.create(options);
+            ref.manager = nipplejs.create(options);
 
-            linear_speed = 0;
-            angular_speed = 0;
-
-            manager.on("start", function (event, nipple) {
+            var linear_speed = 0;
+            var angular_speed = 0;
+            var timer;
+            ref.manager.on("start", function (event, nipple) {
                 timer = setInterval(function () {
                     ref.move(linear_speed, angular_speed);
                 }, 25);
             });
 
-            manager.on("move", function (event, nipple) {
-                max_linear = 2.0; // m/s
-                max_angular = 2.0; // rad/s
-                max_distance = 75.0; // pixels;
+            ref.manager.on("move", function (event, nipple) {
+                var max_linear = 2.0; // m/s
+                var max_angular = 2.0; // rad/s
+                var max_distance = 75.0; // pixels;
                 linear_speed =
                     (Math.sin(nipple.angle.radian) *
                         max_linear *
@@ -135,14 +242,13 @@ var app = new Vue({
                     max_distance;
             });
 
-            manager.on("end", function () {
+            ref.manager.on("end", function () {
                 if (timer) {
                     clearInterval(timer);
                 }
                 ref.move(0, 0);
             });
         },
-
 
 
         getTopics: function() {
@@ -184,8 +290,9 @@ var app = new Vue({
                 this.getTopics();
             }
             else {
-                manager.destroy();
+                this.manager.destroy();
             }
         },
     },
-});
+}
+</script>

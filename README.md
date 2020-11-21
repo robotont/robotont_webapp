@@ -1,28 +1,23 @@
-# robotont-webapp
+# roslibnodejs
 
-### Install rosbridge if it is not installed
+## Project setup
 ```
-sudo apt-get install ros-<rosdistro>-rosbridge-server
-```
-
-## Clone repository
-```
-cd robotont-webapp
+npm install
 ```
 
-### Run python http server
+### Compiles and hot-reloads for development
 ```
-python3 -m http.server
-```
-
-### Run roscore
-```
-roscore
+npm run serve
 ```
 
-### Run rosbridge websocket
+### Compiles and minifies for production
 ```
-roslaunch rosbridge_server rosbridge_websocket.launch
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
 ```
 
 ### Customize configuration
