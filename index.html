@@ -29,7 +29,7 @@
 
                 <div class="col-md-6">
                     <h3>Log messages: </h3>
-                    <div style="max-height: 200px; overflow: auto;">
+                    <div style="max-height: 170px; overflow: auto;">
                         <p v-for="log in logs">
                             {{ log }}
                         </p>
@@ -82,7 +82,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <h3>Topics: </h3>
-                    <div style="max-height: 400px; overflow: auto;">
+                    <div style="max-height: 400px; max-width: 500px; overflow: auto;">
                         <p v-for="t in topics[0]">
                             {{ t }}
                         </p>
@@ -92,7 +92,7 @@
                 
                 <div class="col-md-4">
                     <h3>Nodes: </h3>
-                    <div style="max-height: 400px; overflow: auto;">
+                    <div style="max-height: 400px; max-width: 500px; overflow: auto;">
                         <p v-for="n in nodes[0]">
                             {{ n }}
                         </p>
@@ -100,12 +100,7 @@
                     <button @click="getNodes" :disabled="loading || !connected" class="btn btn-info">Show nodes</button>
                 </div>
             </div>
-            
-    
             <br><br><br><br>
-
-
-
         </div>
 
         <script type="text/javascript" src="res/js/main.js"></script>

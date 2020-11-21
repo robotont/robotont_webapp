@@ -154,7 +154,6 @@ var app = new Vue({
 
             var request = new ROSLIB.ServiceRequest();
 
-            
             var topicsList = [];
             topicsClient.callService(request, function(result) {
                 topicsList.push(result.topics);
@@ -169,8 +168,7 @@ var app = new Vue({
             });
 
             var request = new ROSLIB.ServiceRequest();
-
-            
+       
             var nodesList = [];
             nodesClient.callService(request, function(result) {
                 nodesList.push(result.nodes);
@@ -180,10 +178,14 @@ var app = new Vue({
     },
     watch: {
         connected: function () {
-            if (this.connected)
-                this.joystick()
-            else
-                manager.destroy()
+            if (this.connected) {
+                this.joystick();
+                this.getNodes();
+                this.getTopics();
+            }
+            else {
+                manager.destroy();
+            }
         },
     },
 });
