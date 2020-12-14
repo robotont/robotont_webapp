@@ -2,6 +2,12 @@
     <div id='user' class="container">
         <div class="jumbotron">
             <h1>Robotont</h1>
+            <br>
+            <router-view />
+            <router-link tag="a" to="/">User</router-link>
+            <br>
+            <router-view />
+            <router-link tag="a" to="Admin">Admin</router-link>
         </div>
 
         <div class="row" style="max-height: 200px;">
@@ -15,8 +21,9 @@
                 <input type="text" v-model="ws_address" />
                 <br />
 
-                <button @click="disconnect" class="btn btn-danger" v-if="connected">Disconnect</button>
-                <button @click="connect" class="btn btn-success" v-else>Connect</button>
+                <button @click="disconnect" class="btn btn-danger btn mr-5" v-if="connected">Disconnect</button>
+                <button @click="connect" class="btn btn-success btn mr-5" v-else>Connect</button>
+                <button @click="shutdown" class="btn btn-danger btn mr-5">Shutdown</button>
             </div>
 
             <div class="col-md-6">
@@ -29,47 +36,26 @@
             </div>
         </div>
 
-        <hr>
-
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <h5>Commands</h5>
-            </div>
-
-            <div class="col-md-12 text-center">
-                <button @click="forward" :disabled="loading || !connected" class="btn btn-primary">Go forward</button>
-                <br><br>
-            </div>
-
-            <div class="col-md-4 text-center">
-                <button @click="turnLeft" :disabled="loading || !connected" class="btn btn-primary">Left</button>
-            </div>
-
-            <div class="col-md-4 text-center">
-                <button @click="stop" :disabled="loading || !connected" class="btn btn-danger">Stop</button>
-                <br><br>
-            </div>
-
-            <div class="col-md-4 text-center">
-                <button @click="turnRight" :disabled="loading || !connected" class="btn btn-primary">Right</button>         
-            </div>
-
-            <div class="col-md-12 text-center">
-                <button @click="backward" :disabled="loading || !connected" class="btn btn-primary">Go backward</button>
-                <br><br>
-            </div>
-        </div>
-        
+        <hr>        
 
         <div class="col-md-12 text-center">
             <h5>Joystick</h5>
         </div>
         <br><br><br><br>
-
-        <div id="joystick_zone" style="position: relative;"></div>
+        <div class="row">
+            <div class="col-md-4" id="joystick_zone1" style="position: relative;"></div>
+            <div class="col-md-6" id="joystick_zone2" style="position: relative;"></div>
+        </div>
+        <div class="col-md-12 text-center">
+            <button @click="stop" :disabled="loading || !connected" class="btn btn-danger">Stop</button>
+        </div>
         <br><br><br><br>
 
         <hr>
+
+        <div class="col-md-12">
+            <img src="http://localhost:4000/stream?topic=/usb_cam/image_raw&type=ros_compressed">
+        </div>
 
         <div class="row">
             <div class="col-md-6">
@@ -100,33 +86,44 @@
 import ROSLIB from 'roslib';
 import nipplejs from 'nipplejs';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
 
 export default {
     name: "User",
+
+    components: {
+    },
 
     //lehekülje staatuse salvestamine
     data: function () {
         return {
             connected: false,
             ros: null,
-            ws_address: "192.168.1.165:9090",
+            ws_address: "localhost:9090",
             logs: [],
             loading: false,
             topic: null,
             message: null,
             topics: [],
             nodes:  [],
-            manager: null
+            joystick_manager1: null,
+            joystick_manager2: null
         }
     },
 
     methods: {
+        shutdown: function() {
+            if (confirm("Are you sure you want to shutdown?")) {
+                axios.get('http://localhost:3000/shutdown')
+            }
+        },
+
         connect: function () {
             this.loading = true;
             console.log("Connect to rosbridge server"); 
 
             this.ros = new ROSLIB.Ros({
-                url: "ws://" + this.ws_address,
+                url: "ws://" + this.ws_address
             });
             this.ros.on("connection", () => {
                 this.connected = true;
@@ -148,6 +145,7 @@ export default {
         disconnect: function () {
             this.ros.close();
         },
+
         setTopic: function () {
             this.topic = new ROSLIB.Topic({
                 ros: this.ros,
@@ -155,15 +153,7 @@ export default {
                 messageType: "geometry_msgs/Twist",
             });
         },
-        forward: function () {
-            this.message = new ROSLIB.Message({
-                linear: { x: 1, y: 0, z: 0 },
-                angular: { x: 0, y: 0, z: 0 },
-            });
 
-            this.setTopic();
-            this.topic.publish(this.message);
-        },
         stop: function () {
             this.message = new ROSLIB.Message({
                 linear: { x: 0, y: 0, z: 0 },
@@ -172,33 +162,10 @@ export default {
             this.setTopic();
             this.topic.publish(this.message);
         },
-        backward: function () {
+
+        move: function (linear_x, linear_y, angular) {
             this.message = new ROSLIB.Message({
-                linear: { x: -1, y: 0, z: 0 },
-                angular: { x: 0, y: 0, z: 0 },
-            });
-            this.setTopic();
-            this.topic.publish(this.message);
-        },
-        turnLeft: function () {
-            this.message = new ROSLIB.Message({
-                linear: { x: 0, y: 0, z: 0 },
-                angular: { x: 0, y: 0, z: 0.5 },
-            });
-            this.setTopic();
-            this.topic.publish(this.message);
-        },
-        turnRight: function () {
-            this.message = new ROSLIB.Message({
-                linear: { x: 0, y: 0, z: 0 },
-                angular: { x: 0, y: 0, z: -0.5 },
-            });
-            this.setTopic();
-            this.topic.publish(this.message);
-        },
-        move: function (linear, angular) {
-            this.message = new ROSLIB.Message({
-                linear: { x: linear, y: 0, z: 0 },
+                linear: { x: linear_x, y: linear_y, z: 0 },
                 angular: { x: 0, y: 0, z: angular },
             });
             this.setTopic();
@@ -206,35 +173,78 @@ export default {
         },
 
         joystick: function () {
-            var options = {
-                zone: document.getElementById("joystick_zone"),
+            var options1 = {
+                zone: document.getElementById("joystick_zone1"),
                 threshold: 0.1,
                 position: { left: 50 + "%" },
                 mode: "static",
                 size: 150,
                 color: "#000000",
             };
+            var options2 = {
+                zone: document.getElementById("joystick_zone2"),
+                threshold: 0.1,
+                position: { left: 90 + "%" },
+                mode: "static",
+                size: 150,
+                color: "#000000",
+                lockX: true,
+            };
             var ref = this;
-            ref.manager = nipplejs.create(options);
+            ref.joystick_manager1 = nipplejs.create(options1);
+            ref.joystick_manager2 = nipplejs.create(options2);
 
-            var linear_speed = 0;
+            var linear_speed_x = 0;
+            var linear_speed_y = 0
             var angular_speed = 0;
-            var timer;
-            ref.manager.on("start", function (event, nipple) {
-                timer = setInterval(function () {
-                    ref.move(linear_speed, angular_speed);
+            var timer1;
+            var timer2;
+            ref.joystick_manager1.on("start", function (event, nipple) {
+                timer1 = setInterval(function () {
+                    ref.move(linear_speed_x, linear_speed_y, angular_speed);
                 }, 25);
             });
 
-            ref.manager.on("move", function (event, nipple) {
+            ref.joystick_manager1.on("move", function (event, nipple) {
                 var max_linear = 2.0; // m/s
                 var max_angular = 2.0; // rad/s
                 var max_distance = 75.0; // pixels;
-                linear_speed =
+                linear_speed_x =
                     (Math.sin(nipple.angle.radian) *
                         max_linear *
                         nipple.distance) /
                     max_distance;
+
+                linear_speed_y =
+                    (-Math.cos(nipple.angle.radian) *
+                        max_angular *
+                        nipple.distance) /
+                    max_distance;
+
+                angular_speed = 0;
+            });
+
+            ref.joystick_manager1.on("end", function () {
+                if (timer1) {
+                    clearInterval(timer1);
+                }
+                ref.move(0, 0, angular_speed);
+            });
+
+
+            ref.joystick_manager2.on("start", function (event, nipple) {
+                timer2 = setInterval(function () {
+                    ref.move(linear_speed_x, linear_speed_y, angular_speed);
+                }, 25);
+            });
+
+            ref.joystick_manager2.on("move", function (event, nipple) {
+                var max_linear = 2.0; // m/s
+                var max_angular = 2.0; // rad/s
+                var max_distance = 75.0; // pixels;
+                linear_speed_x = 0;
+                linear_speed_y = 0;
+
                 angular_speed =
                     (-Math.cos(nipple.angle.radian) *
                         max_angular *
@@ -242,14 +252,13 @@ export default {
                     max_distance;
             });
 
-            ref.manager.on("end", function () {
-                if (timer) {
-                    clearInterval(timer);
+            ref.joystick_manager2.on("end", function () {
+                if (timer2) {
+                    clearInterval(timer2);
                 }
-                ref.move(0, 0);
+                ref.move(linear_speed_x, linear_speed_y, 0);
             });
         },
-
 
         getTopics: function() {
             var topicsClient = new ROSLIB.Service({
@@ -281,6 +290,7 @@ export default {
             });
             this.nodes = nodesList;
         },
+        
     },
     watch: {
         connected: function () {
@@ -290,7 +300,8 @@ export default {
                 this.getTopics();
             }
             else {
-                this.manager.destroy();
+                this.joystick_manager1.destroy();
+                this.joystick_manager2.destroy();
             }
         },
     },

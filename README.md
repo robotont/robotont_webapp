@@ -1,24 +1,24 @@
 # roslibnodejs
 
+```
+sudo apt-get install ros-melodic-web-video-server
+sudo apt-get install ros-melodic-rosbridge-server
+
+
+rosrun web_video_server web_video_server _port:=4000
+roslaunch rosbridge_server rosbridge_websocket.launch
+```
+
 ## Project setup
 ```
+cd frontend
 npm install
-```
-
-### Compiles and hot-reloads for development
-```
 npm run serve
-```
 
-### Compiles and minifies for production
-```
-npm run build
-```
 
-### Lints and fixes files
+cd backend
+npm install
+npm start
 ```
-npm run lint
-```
-
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
