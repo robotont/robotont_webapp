@@ -1,40 +1,77 @@
 <template>
-    <div id='user' class="container">
-        <div class="jumbotron">
-            <h1>Robotont</h1>
-            <br>
-            <router-view />
-            <router-link tag="a" to="/">User</router-link>
-            <br>
-            <router-view />
-            <router-link tag="a" to="Admin">Admin</router-link>
-        </div>
-        <br>
-        <div class="col-md-5">
-            <button @click="rosRestart" class="btn btn-primary btn mr-3">Restart ROS</button>
-            <button @click="rosStart" class="btn btn-primary btn mr-3">Start ROS</button>
-            <button @click="rosStop" class="btn btn-primary btn mr-3">Stop ROS</button>
-        </div>   
-    </div>
+    <b-container fluid="lg" class="container">
+        <b-row>
+            <b-col col lg="12">
+                <b-button @click="rosRestart" class="mt-1" size="lg" block variant="success">Restart ROS</b-button><br>
+                <b-button @click="rosStart" size="lg" block variant="success">Start ROS</b-button><br>
+                <b-button @click="rosStop" size="lg" block variant="danger">Stop ROS</b-button><br>
+                <b-button :disabled="showPointCloud" @click="pointCloud" size="lg" block variant="info">Show PointCloud</b-button><br>
+            </b-col>
+        </b-row>
+        <div id="webViewer"></div>
+    </b-container>
 </template>
 
 <script>
 import axios from 'axios';
+import ROSLIB from 'roslib'
+import * as ROS3D from 'ros3d';
+import { mapGetters } from 'vuex';
 export default {
 
     name: "Admin",
+    data: function() {
+        return {
+            showPointCloud: false
+        }
+    },
+    computed: {
+        ...mapGetters(["getRos", "getIP"])
+    },
     methods: {
         rosRestart: function() {
-            axios.get('http://localhost:3000/rosRestart')
+            let url = 'http://' + this.getIP.ip + ':3000/rosRestart'
+            axios.post(url)
         },
         rosStart: function() {
-            axios.get('http://localhost:3000/rosStart')
+            let url = 'http://' + this.getIP.ip + ':3000/rosStart'
+            axios.post(url)
         },
         rosStop: function() {
-            axios.get('http://localhost:3000/rosStop')
+            let url = 'http://' + this.getIP.ip + ':3000/rosStop'
+            axios.post(url)
+        },
+
+
+        pointCloud: function() {
+            this.showPointCloud = true;
+
+            var viewer = new ROS3D.Viewer({
+                divID : 'webViewer',
+                width : 800,
+                height : 600,
+                antialias : true,
+                background : '#111111'
+            });
+
+
+            // Setup a client to listen to TFs.
+            var tfClient = new ROSLIB.TFClient({
+                ros : this.getRos.ros,
+                angularThres : 0.01,
+                transThres : 0.01,
+                rate : 10.0,
+            });
+
+            var tmpSub = new ROS3D.PointCloud2({
+                ros:this.getRos.ros,
+                tfClient: tfClient, 
+                rootObject: viewer.scene,
+                topic: '/rtabmap/cloud_map',
+                material: {size: 0.01, color: 0xeeeeee }
+            });
         },
     } 
-    
 }
 </script>
 

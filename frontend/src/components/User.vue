@@ -1,5 +1,65 @@
 <template>
-    <div id='user' class="container">
+<div>
+    <b-container fluid="lg">
+
+        <!-- Connection input and log -->
+        <b-row>
+            <b-col col lg="6">
+                <h3>Connection status</h3>
+                <p class="text-success" v-if="connected">Connected!</p>
+                <p class="text-danger" v-if="!connected">Not connected!</p>
+
+                <label>Websockect server address</label>
+                <br>
+                <input type="text" v-model="ws_address" />
+
+                <br>
+
+                <b-button @click="disconnect" class="mt-1" block variant="danger" v-if="connected">Disconnect</b-button>
+                <b-button @click="connect" class="mt-1" block variant="success" v-if="!connected">Connect</b-button>
+            </b-col>
+            <b-col col lg="6">
+                <h3>Log messages: </h3>
+                <div style="max-height: 170px; overflow: auto;">
+                    <p v-for="log in logs" :key="log">
+                        {{ log }}
+                    </p>
+                </div>
+            </b-col>
+        </b-row>
+        <hr>
+        
+
+        <!-- Joystick controls -->
+        <b-row class="text-center">
+            <b-col col lg="12">
+                <h5>Joystick Controls</h5>
+            </b-col>
+        </b-row>
+
+        <br><br><br><br>
+
+        <b-row>
+            <b-col col lg="6" id="joystick_zone1"></b-col>
+            <b-col col lg="6" id="joystick_zone2"></b-col>
+        </b-row>
+
+        <br><br><br><br>
+        <br><br><br><br>
+
+        <!-- Camera feed -->
+        <b-row class="text-center">
+            <b-col col lg="12">
+                <b-img v-if="connected" :src="video_src" fluid></b-img>
+            </b-col>
+        </b-row>
+        <br>
+
+
+    </b-container>
+
+</div>
+    <!--<div class="container">
         <div class="jumbotron">
             <h1>Robotont</h1>
             <br>
@@ -29,7 +89,7 @@
             <div class="col-md-6">
                 <h3>Log messages: </h3>
                 <div style="max-height: 170px; overflow: auto;">
-                    <p v-for="log in logs" v-bind:key="log">
+                    <p v-for="log in logs" :key="log">
                         {{ log }}
                     </p>
                 </div>
@@ -43,7 +103,7 @@
         </div>
         <br><br><br><br>
         <div class="row">
-            <div class="col-md-4" id="joystick_zone1" style="position: relative;"></div>
+            <div class="col-md-6" id="joystick_zone1" style="position: relative;"></div>
             <div class="col-md-6" id="joystick_zone2" style="position: relative;"></div>
         </div>
         <div class="col-md-12 text-center">
@@ -53,8 +113,8 @@
 
         <hr>
 
-        <div class="col-md-12">
-            <img src="http://localhost:4000/stream?topic=/usb_cam/image_raw&type=ros_compressed">
+        <div class="col-md-12 text-center">
+            <img v-if="connected" :src="video_src">
         </div>
 
         <div class="row">
@@ -68,7 +128,7 @@
                 <button @click="getTopics" :disabled="loading || !connected" class="btn btn-info">Show topics</button>
             </div>
             
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <h3>Nodes: </h3>
                 <div style="max-height: 400px; max-width: 500px; overflow: auto;">
                     <p v-for="n in nodes[0]" v-bind:key="n">
@@ -79,20 +139,17 @@
             </div>
         </div>
         <br><br><br><br>
-    </div>
+    </div>-->
 </template>
 
 <script>
 import ROSLIB from 'roslib';
 import nipplejs from 'nipplejs';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     name: "User",
-
-    components: {
-    },
 
     //lehekülje staatuse salvestamine
     data: function () {
@@ -100,6 +157,7 @@ export default {
             connected: false,
             ros: null,
             ws_address: "localhost:9090",
+            video_src: "http://localhost:4000/stream?topic=/camera/color/image_raw&type=ros_compressed",
             logs: [],
             loading: false,
             topic: null,
@@ -111,13 +169,12 @@ export default {
         }
     },
 
-    methods: {
-        shutdown: function() {
-            if (confirm("Are you sure you want to shutdown?")) {
-                axios.get('http://localhost:3000/shutdown')
-            }
-        },
+    computed: {
+        ...mapGetters(["getRos", "getIP", "ifConnected"])
+    },
 
+    methods: {
+        ...mapActions(['setRos', 'setConnect', 'setIP']),
         connect: function () {
             this.loading = true;
             console.log("Connect to rosbridge server"); 
@@ -125,24 +182,36 @@ export default {
             this.ros = new ROSLIB.Ros({
                 url: "ws://" + this.ws_address
             });
+            
+            this.video_src = "http://" + this.ws_address.slice(0, -5) + ":4000/stream?topic=/camera/color/image_raw&type=ros_compressed"
+            
             this.ros.on("connection", () => {
                 this.connected = true;
+                this.setRos({ros: this.ros})
+                this.setConnect({connected: true});
+                this.setIP({ip: this.ws_address.slice(0, -5)})
                 this.loading = false;
                 console.log("Connected");
                 this.logs.unshift(new Date().toLocaleTimeString("it-IT") + " Connected!");
             });
+            
             this.ros.on("error", (error) => {
                 console.log("Error connecting to websocekt server: ", error);
                 this.logs.unshift(new Date().toLocaleTimeString("it-IT") + " Error connecting to websocekt server");
             });
+            
             this.ros.on("close", () => {
                 this.connected = false;
+                this.setConnect({connected: false})
                 this.loading = false;
                 console.log("Connection to websocket server closed");
                 this.logs.unshift(new Date().toLocaleTimeString("it-IT") + " Connection to websocket server closed");
             });
         },
         disconnect: function () {
+            this.connected = false;
+            this.setConnect({connected: false})
+            this.loading = false;
             this.ros.close();
         },
 
@@ -176,7 +245,7 @@ export default {
             var options1 = {
                 zone: document.getElementById("joystick_zone1"),
                 threshold: 0.1,
-                position: { left: 50 + "%" },
+                position: { left: 30 + "%" },
                 mode: "static",
                 size: 150,
                 color: "#000000",
@@ -184,7 +253,7 @@ export default {
             var options2 = {
                 zone: document.getElementById("joystick_zone2"),
                 threshold: 0.1,
-                position: { left: 90 + "%" },
+                position: { right: 40 + "%" },
                 mode: "static",
                 size: 150,
                 color: "#000000",
@@ -260,7 +329,7 @@ export default {
             });
         },
 
-        getTopics: function() {
+        /*getTopics: function() {
             var topicsClient = new ROSLIB.Service({
             ros: this.ros,
             name: '/rosapi/topics',
@@ -289,9 +358,14 @@ export default {
                 nodesList.push(result.nodes);
             });
             this.nodes = nodesList;
-        },
+        },*/
         
     },
+    mounted: function() {
+        this.connected = this.ifConnected.connected;
+        this.ros = this.getRos.ros
+    },
+
     watch: {
         connected: function () {
             if (this.connected) {
