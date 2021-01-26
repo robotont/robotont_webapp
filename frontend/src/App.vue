@@ -6,9 +6,13 @@
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav>
                     <router-link tag="b-nav-item" to="/">User</router-link>
-                    <router-link tag="b-nav-item" to="Admin">Admin</router-link>
+                    <router-link tag="b-nav-item" to="Admin">Advanced</router-link>
                 </b-navbar-nav>
-                <b-button class="ml-auto" @click="shutdown" variant="danger" size="md">Shutdown</b-button>
+                <b-navbar-nav class="ml-auto">
+                    <b-nav-text v-if="ifConnected.connected">Connected</b-nav-text>
+                    <b-nav-text v-if="!ifConnected.connected">Not connected</b-nav-text>
+                    <b-button @click="shutdown" class="ml-3" variant="danger" size="md">Shutdown</b-button>
+                </b-navbar-nav>
             </b-collapse>
         </b-navbar>
         <router-view />
@@ -25,7 +29,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["getIP"])
+        ...mapGetters(["getIP", "ifConnected"])
     },
 
     methods: {

@@ -1,151 +1,73 @@
 <template>
-<div>
-    <b-container fluid="lg">
+    <div>
+        <b-container fluid="lg">
+            <!-- Connection input and log -->
+            <b-row>
+                <b-col col lg="6">
+                    <h3>Connection status</h3>
+                    <p class="text-success" v-if="connected">Connected!</p>
+                    <p class="text-danger" v-if="!connected">Not connected!</p>
 
-        <!-- Connection input and log -->
-        <b-row>
-            <b-col col lg="6">
-                <h3>Connection status</h3>
-                <p class="text-success" v-if="connected">Connected!</p>
-                <p class="text-danger" v-if="!connected">Not connected!</p>
+                    <label>Websockect server address</label>
+                    <br>
+                    <b-input type="text" v-model="ws_address" />
 
-                <label>Websockect server address</label>
-                <br>
-                <input type="text" v-model="ws_address" />
+                    <br>
 
-                <br>
-
-                <b-button @click="disconnect" class="mt-1" block variant="danger" v-if="connected">Disconnect</b-button>
-                <b-button @click="connect" class="mt-1" block variant="success" v-if="!connected">Connect</b-button>
-            </b-col>
-            <b-col col lg="6">
-                <h3>Log messages: </h3>
-                <div style="max-height: 170px; overflow: auto;">
-                    <p v-for="log in logs" :key="log">
-                        {{ log }}
-                    </p>
-                </div>
-            </b-col>
-        </b-row>
-        <hr>
-        
-
-        <!-- Joystick controls -->
-        <b-row class="text-center">
-            <b-col col lg="12">
-                <h5>Joystick Controls</h5>
-            </b-col>
-        </b-row>
-
-        <br><br><br><br>
-
-        <b-row>
-            <b-col col lg="6" id="joystick_zone1"></b-col>
-            <b-col col lg="6" id="joystick_zone2"></b-col>
-        </b-row>
-
-        <br><br><br><br>
-        <br><br><br><br>
-
-        <!-- Camera feed -->
-        <b-row class="text-center">
-            <b-col col lg="12">
-                <b-img v-if="connected" :src="video_src" fluid></b-img>
-            </b-col>
-        </b-row>
-        <br>
-
-
-    </b-container>
-
-</div>
-    <!--<div class="container">
-        <div class="jumbotron">
-            <h1>Robotont</h1>
-            <br>
-            <router-view />
-            <router-link tag="a" to="/">User</router-link>
-            <br>
-            <router-view />
-            <router-link tag="a" to="Admin">Admin</router-link>
-        </div>
-
-        <div class="row" style="max-height: 200px;">
-            <div class="col-md-6">
-                <h3>Connection status</h3>
-
-                <p class="text-success" v-if="connected">Connected!</p>
-                <p class="text-danger" v-if="!connected">Not connected!</p>
-
-                <label>Websockect server address</label>
-                <input type="text" v-model="ws_address" />
-                <br />
-
-                <button @click="disconnect" class="btn btn-danger btn mr-5" v-if="connected">Disconnect</button>
-                <button @click="connect" class="btn btn-success btn mr-5" v-else>Connect</button>
-                <button @click="shutdown" class="btn btn-danger btn mr-5">Shutdown</button>
-            </div>
-
-            <div class="col-md-6">
-                <h3>Log messages: </h3>
-                <div style="max-height: 170px; overflow: auto;">
-                    <p v-for="log in logs" :key="log">
-                        {{ log }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <hr>        
-
-        <div class="col-md-12 text-center">
-            <h5>Joystick</h5>
-        </div>
-        <br><br><br><br>
-        <div class="row">
-            <div class="col-md-6" id="joystick_zone1" style="position: relative;"></div>
-            <div class="col-md-6" id="joystick_zone2" style="position: relative;"></div>
-        </div>
-        <div class="col-md-12 text-center">
-            <button @click="stop" :disabled="loading || !connected" class="btn btn-danger">Stop</button>
-        </div>
-        <br><br><br><br>
-
-        <hr>
-
-        <div class="col-md-12 text-center">
-            <img v-if="connected" :src="video_src">
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <h3>Topics: </h3>
-                <div style="max-height: 400px; max-width: 500px; overflow: auto;">
-                    <p v-for="t in topics[0]" v-bind:key="t">
-                        {{ t }}
-                    </p>
-                </div>
-                <button @click="getTopics" :disabled="loading || !connected" class="btn btn-info">Show topics</button>
-            </div>
+                    <b-button @click="disconnect" class="mt-1" block variant="danger" v-if="connected">Disconnect</b-button>
+                    <b-button @click="connect" class="mt-1" block variant="success" v-if="!connected">Connect</b-button>
+                </b-col>
+                <b-col col lg="6">
+                    <h3>Log messages: </h3>
+                    <div style="max-height: 170px; overflow: auto;">
+                        <p v-for="log in logs" :key="log">
+                            {{ log }}
+                        </p>
+                    </div>
+                </b-col>
+            </b-row>
+            <hr>
             
-            <div class="col-md-6">
-                <h3>Nodes: </h3>
-                <div style="max-height: 400px; max-width: 500px; overflow: auto;">
-                    <p v-for="n in nodes[0]" v-bind:key="n">
-                        {{ n }}
-                    </p>
-                </div>
-                <button @click="getNodes" :disabled="loading || !connected" class="btn btn-info">Show nodes</button>
-            </div>
-        </div>
-        <br><br><br><br>
-    </div>-->
+
+            <!-- Joystick controls -->
+            <b-row class="text-center">
+                <b-col col lg="12">
+                    <h5>Joystick Controls</h5>
+                </b-col>
+            </b-row>
+
+            <br><br><br><br>
+
+            <b-row>
+                <b-col col lg="6" id="joystick_zone1"></b-col>
+                <b-col col lg="6" id="joystick_zone2"></b-col>
+            </b-row>
+
+            <br><br><br><br>
+            <br><br><br><br>
+            <hr>
+
+            <!-- Camera feed -->
+            <b-row>
+                <b-col col lg="6">
+                    <h5 class="text-center">Camera feed</h5>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col col lg="6">
+                    <b-img v-if="showCamera" :src="video_src" fluid></b-img> <br>
+                    <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="!showCamera" block variant="info">Show camera feed</b-button>
+                    <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="showCamera" block variant="info">Hide camera feed</b-button>
+                </b-col>
+            </b-row>
+            <br>
+        </b-container>
+    </div>
 </template>
 
 <script>
 import ROSLIB from 'roslib';
 import nipplejs from 'nipplejs';
-import axios from 'axios';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -162,10 +84,9 @@ export default {
             loading: false,
             topic: null,
             message: null,
-            topics: [],
-            nodes:  [],
             joystick_manager1: null,
-            joystick_manager2: null
+            joystick_manager2: null,
+            showCamera: false
         }
     },
 
@@ -183,7 +104,6 @@ export default {
                 url: "ws://" + this.ws_address
             });
             
-            this.video_src = "http://" + this.ws_address.slice(0, -5) + ":4000/stream?topic=/camera/color/image_raw&type=ros_compressed"
             
             this.ros.on("connection", () => {
                 this.connected = true;
@@ -245,7 +165,7 @@ export default {
             var options1 = {
                 zone: document.getElementById("joystick_zone1"),
                 threshold: 0.1,
-                position: { left: 30 + "%" },
+                position: { left: 40 + "%" },
                 mode: "static",
                 size: 150,
                 color: "#000000",
@@ -328,38 +248,16 @@ export default {
                 ref.move(linear_speed_x, linear_speed_y, 0);
             });
         },
+        cameraFeed: function() {
+            this.video_src = "http://" + this.ws_address.slice(0, -5) + ":4000/stream?topic=/camera/color/image_raw&type=ros_compressed"
+            if (this.showCamera) {
+                this.showCamera = false
+            }
+            else {
+                this.showCamera = true;
+            }
 
-        /*getTopics: function() {
-            var topicsClient = new ROSLIB.Service({
-            ros: this.ros,
-            name: '/rosapi/topics',
-            serviceType: 'rosapi/Topics'
-            });
-
-            var request = new ROSLIB.ServiceRequest();
-
-            var topicsList = [];
-            topicsClient.callService(request, function(result) {
-                topicsList.push(result.topics);
-            });
-            this.topics = topicsList;
-        },
-        getNodes: function() {
-            var nodesClient = new ROSLIB.Service({
-            ros: this.ros,
-            name: '/rosapi/nodes',
-            serviceType: 'rosapi/Nodes'
-            });
-
-            var request = new ROSLIB.ServiceRequest();
-       
-            var nodesList = [];
-            nodesClient.callService(request, function(result) {
-                nodesList.push(result.nodes);
-            });
-            this.nodes = nodesList;
-        },*/
-        
+        }    
     },
     mounted: function() {
         this.connected = this.ifConnected.connected;
@@ -370,8 +268,6 @@ export default {
         connected: function () {
             if (this.connected) {
                 this.joystick();
-                this.getNodes();
-                this.getTopics();
             }
             else {
                 this.joystick_manager1.destroy();

@@ -16,9 +16,14 @@ function rosStop() {
     return shell.exec('sudo systemctl stop robotont.service')
 }
 
+function shellOutput(command) {
+    return shell.exec(command).stdout
+}
+
 module.exports = {
     shutdown: shutdown,
     rosRestart: rosRestart,
     rosStart: rosStart,
     rosStop: rosStop,
+    shellOutput: shellOutput
 };
