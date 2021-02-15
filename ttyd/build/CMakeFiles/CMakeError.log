@@ -1,0 +1,34 @@
+Determining if the LWS_WITH_MBEDTLS exist failed with the following output:
+Change Dir: /home/rauno/ttyd/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_f88ce/fast"
+/usr/bin/make -f CMakeFiles/cmTC_f88ce.dir/build.make CMakeFiles/cmTC_f88ce.dir/build
+make[1]: Entering directory '/home/rauno/ttyd/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_f88ce.dir/CheckSymbolExists.c.o
+/usr/bin/cc  -I/usr/include/json-c  -D_GNU_SOURCE    -o CMakeFiles/cmTC_f88ce.dir/CheckSymbolExists.c.o   -c /home/rauno/ttyd/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+/home/rauno/ttyd/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c: In function ‘main’:
+/home/rauno/ttyd/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: error: ‘LWS_WITH_MBEDTLS’ undeclared (first use in this function)
+   return ((int*)(&LWS_WITH_MBEDTLS))[argc];
+                   ^~~~~~~~~~~~~~~~
+/home/rauno/ttyd/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:8:19: note: each undeclared identifier is reported only once for each function it appears in
+CMakeFiles/cmTC_f88ce.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_f88ce.dir/CheckSymbolExists.c.o' failed
+make[1]: *** [CMakeFiles/cmTC_f88ce.dir/CheckSymbolExists.c.o] Error 1
+make[1]: Leaving directory '/home/rauno/ttyd/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_f88ce/fast' failed
+make: *** [cmTC_f88ce/fast] Error 2
+
+File /home/rauno/ttyd/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <lws_config.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef LWS_WITH_MBEDTLS
+  return ((int*)(&LWS_WITH_MBEDTLS))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+

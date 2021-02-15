@@ -42,28 +42,19 @@
         <!-- Ros service buttons -->
         <b-row>
             <b-col col lg="12">
-                <b-button @click="rosRestart" :disabled="!ifConnected.connected" class="mt-1" size="md" block variant="success">Restart ROS service</b-button><br>
-                <b-button @click="rosStart" :disabled="!ifConnected.connected" size="md" block variant="success">Start ROS service</b-button><br>
-                <b-button @click="rosStop" :disabled="!ifConnected.connected" size="md" block variant="danger">Stop ROS service</b-button><br>
+                <div class="text-center">
+                    <b-button @click="rosRestart" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="success">Restart ROS service</b-button>
+                    <b-button @click="rosStart" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="success">Start ROS service</b-button>
+                    <b-button @click="rosStop" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="danger">Stop ROS service</b-button>
+                </div>
             </b-col>
-        </b-row>
-
-        <!-- Ros3d -->
-        <b-row>
-            <b-col col lg="12">
-                <div class="text-center" id="webViewer"></div>
-                <b-button :disabled="showPointCloud" @click="depthCloud" size="lg" class="mt-1" block variant="info">Show DepthCloud</b-button><br>
-            </b-col>
-        </b-row>
-        
+        </b-row>        
     </b-container>
 </template>
 
 <script>
 import axios from 'axios';
 import ROSLIB from 'roslib';
-import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js'
-import * as ROS3D from 'ros3d';
 import { mapGetters } from 'vuex';
 export default {
 
@@ -71,7 +62,6 @@ export default {
     data: function() {
         return {
             isTerminalOpen: false,
-            showPointCloud: false,
             topics: [],
             nodes: [],
             terminalUrl: "http://localhost:5000"
@@ -106,61 +96,6 @@ export default {
             }
         },
 
-        depthCloud: function() {
-            let url = 'http://' + this.getIP.ip + ':4000/stream?topic=/depthcloud_encoded&type=mjpeg'
-            this.showPointCloud = true;
-
-            var viewer = new ROS3D.Viewer({
-                divID : 'webViewer',
-                width : 800,
-                height : 600,
-                antialias : true,
-                background : '#111111'
-            });
-            viewer.addObject(new ROS3D.Grid())
-
-            // Setup a client to listen to TFs.
-            var tfClient = new ROSLIB.TFClient({
-                ros: this.getRos.ros,
-                angularThres: 0.01,
-                transThres: 0.01,
-                rate: 10.0,
-            });
-
-            /*console.log("Loading mesh resource");
-            const mesh = new ROS3D.MeshResource({
-                resource: 'robotont_description/meshes/body.stl',
-                path: 'http://localhost:8000/',
-                warnings: true
-            });
-            console.log("Loaded mesh: ", mesh);*/
-            var loader = new ColladaLoader();
-            // Setup the URDF client
-            var urdfClient = new ROS3D.UrdfClient({
-                ros: this.getRos.ros,
-                tfClient: tfClient,
-                path: "http://0.0.0.0:8000/",
-                rootObject: viewer.scene,
-                loader : loader
-            });
-
-            // Setup Camera DepthCloud stream
-            var depthCloud = new ROS3D.DepthCloud({
-                url : url,
-                streamType: "mjpeg",
-                f : 525.0
-            });
-            depthCloud.startStream();
-
-            // Create Camera scene node
-            var cameraNode = new ROS3D.SceneNode({
-                frameID: "camera_depth_optical_frame",
-                tfClient : tfClient,
-                object : depthCloud
-            });
-            viewer.scene.add(cameraNode);
-        },
-
         getTopics: function() {
             var topicsClient = new ROSLIB.Service({
             ros: this.getRos.ros,
@@ -192,9 +127,10 @@ export default {
             this.nodes = nodesList;
         },
     },
-    mounted: function() {
+    created: function() {
         this.getTopics();
         this.getNodes();
+        this.toggleTerminal();
     }
 }
 </script>

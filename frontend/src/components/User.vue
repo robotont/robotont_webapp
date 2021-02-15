@@ -1,34 +1,7 @@
 <template>
     <div>
         <b-container fluid="lg">
-            <!-- Connection input and log -->
-            <b-row>
-                <b-col col lg="6">
-                    <h3>Connection status</h3>
-                    <p class="text-success" v-if="connected">Connected!</p>
-                    <p class="text-danger" v-if="!connected">Not connected!</p>
-
-                    <label>Websockect server address</label>
-                    <br>
-                    <b-input type="text" v-model="ws_address" />
-
-                    <br>
-
-                    <b-button @click="disconnect" class="mt-1" block variant="danger" v-if="connected">Disconnect</b-button>
-                    <b-button @click="connect" class="mt-1" block variant="success" v-if="!connected">Connect</b-button>
-                </b-col>
-                <b-col col lg="6">
-                    <h3>Log messages: </h3>
-                    <div style="max-height: 170px; overflow: auto;">
-                        <p v-for="log in logs" :key="log">
-                            {{ log }}
-                        </p>
-                    </div>
-                </b-col>
-            </b-row>
-            <hr>
-            
-
+            <br>
             <!-- Joystick controls -->
             <b-row class="text-center">
                 <b-col col lg="12">
@@ -44,7 +17,6 @@
             </b-row>
 
             <br><br><br><br>
-            <br><br><br><br>
             <hr>
 
             <!-- Camera feed -->
@@ -52,12 +24,19 @@
                 <b-col col lg="6">
                     <h5 class="text-center">Camera feed</h5>
                 </b-col>
+                <b-col col lg="6">
+                    <h5 class="text-center">Depthcloud</h5>
+                </b-col>
             </b-row>
             <b-row>
                 <b-col col lg="6">
-                    <b-img v-if="showCamera" :src="video_src" fluid></b-img> <br>
-                    <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="!showCamera" block variant="info">Show camera feed</b-button>
-                    <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="showCamera" block variant="info">Hide camera feed</b-button>
+                    <b-img v-if="showCamera" :src="video_src" fluid></b-img><br>
+                    <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="!showCamera" variant="info">Show camera feed</b-button>
+                    <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="showCamera" variant="info">Hide camera feed</b-button>
+                </b-col>
+                <b-col col lg="6">
+                    <div class="text-center" id="webViewer"></div>
+                    <b-button :disabled="showPointCloud" @click="depthCloud" class="mt-1" variant="info">Show DepthCloud</b-button><br>
                 </b-col>
             </b-row>
             <br>
@@ -69,6 +48,8 @@
 import ROSLIB from 'roslib';
 import nipplejs from 'nipplejs';
 import { mapGetters, mapActions } from 'vuex';
+import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js'
+import * as ROS3D from 'ros3d';
 
 export default {
     name: "User",
@@ -78,7 +59,7 @@ export default {
         return {
             connected: false,
             ros: null,
-            ws_address: "localhost:9090",
+            ws_address: null,
             video_src: "http://localhost:4000/stream?topic=/camera/color/image_raw&type=ros_compressed",
             logs: [],
             loading: false,
@@ -86,7 +67,8 @@ export default {
             message: null,
             joystick_manager1: null,
             joystick_manager2: null,
-            showCamera: false
+            showCamera: false,
+            showPointCloud: false,
         }
     },
 
@@ -96,6 +78,7 @@ export default {
 
     methods: {
         ...mapActions(['setRos', 'setConnect', 'setIP']),
+
         connect: function () {
             this.loading = true;
             console.log("Connect to rosbridge server"); 
@@ -103,8 +86,7 @@ export default {
             this.ros = new ROSLIB.Ros({
                 url: "ws://" + this.ws_address
             });
-            
-            
+        
             this.ros.on("connection", () => {
                 this.connected = true;
                 this.setRos({ros: this.ros})
@@ -249,25 +231,82 @@ export default {
             });
         },
         cameraFeed: function() {
-            this.video_src = "http://" + this.ws_address.slice(0, -5) + ":4000/stream?topic=/camera/color/image_raw&type=ros_compressed"
+            this.video_src = "http://" + this.getIP.ip + ":4000/stream?topic=/camera/color/image_raw&type=ros_compressed"
             if (this.showCamera) {
                 this.showCamera = false
             }
             else {
                 this.showCamera = true;
             }
+        },
 
-        }    
+        depthCloud: function() {
+            let url = 'http://' + this.getIP.ip + ':4000/stream?topic=/depthcloud_encoded&type=mjpeg'
+            this.showPointCloud = true;
+
+            var viewer = new ROS3D.Viewer({
+                divID : 'webViewer',
+                width : window.innerWidth / 3,
+                height : 600,
+                antialias : true,
+                background : '#111111'
+            });
+            viewer.addObject(new ROS3D.Grid())
+
+            // Setup a client to listen to TFs.
+            var tfClient = new ROSLIB.TFClient({
+                ros: this.getRos.ros,
+                angularThres: 0.01,
+                transThres: 0.01,
+                rate: 10.0,
+            });
+
+            /*console.log("Loading mesh resource");
+            const mesh = new ROS3D.MeshResource({
+                resource: 'robotont_description/meshes/body.stl',
+                path: 'http://localhost:8000/',
+                warnings: true
+            });
+            console.log("Loaded mesh: ", mesh);*/
+            
+            var loader = new ColladaLoader();
+            // Setup the URDF client
+            var urdfClient = new ROS3D.UrdfClient({
+                ros: this.getRos.ros,
+                tfClient: tfClient,
+                path: "http://0.0.0.0:8000/",
+                rootObject: viewer.scene,
+                loader : loader
+            });
+
+            // Setup Camera DepthCloud stream
+            var depthCloud = new ROS3D.DepthCloud({
+                url : url,
+                streamType: "mjpeg",
+                f : 525.0
+            });
+            depthCloud.startStream();
+
+            // Create Camera scene node
+            var cameraNode = new ROS3D.SceneNode({
+                frameID: "camera_depth_optical_frame",
+                tfClient : tfClient,
+                object : depthCloud
+            });
+            viewer.scene.add(cameraNode);
+        },    
     },
-    mounted: function() {
-        this.connected = this.ifConnected.connected;
-        this.ros = this.getRos.ros
+
+    created: function() {
+        this.ws_address = window.location.host.slice(0, -5) + ":9090";
+        this.connect();
     },
 
     watch: {
         connected: function () {
             if (this.connected) {
                 this.joystick();
+                this.cameraFeed();
             }
             else {
                 this.joystick_manager1.destroy();

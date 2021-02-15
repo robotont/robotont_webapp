@@ -1,0 +1,7 @@
+/home/rauno/ttyd/build/CMakeFiles/install/strip.dir
+/home/rauno/ttyd/build/CMakeFiles/edit_cache.dir
+/home/rauno/ttyd/build/CMakeFiles/ttyd.dir
+/home/rauno/ttyd/build/CMakeFiles/install.dir
+/home/rauno/ttyd/build/CMakeFiles/rebuild_cache.dir
+/home/rauno/ttyd/build/CMakeFiles/list_install_components.dir
+/home/rauno/ttyd/build/CMakeFiles/install/local.dir
