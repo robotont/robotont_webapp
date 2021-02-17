@@ -42,13 +42,15 @@
         <!-- Ros service buttons -->
         <b-row>
             <b-col col lg="12">
+                <h3 class="text-center">ROS service control</h3>
                 <div class="text-center">
                     <b-button @click="rosRestart" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="success">Restart ROS service</b-button>
                     <b-button @click="rosStart" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="success">Start ROS service</b-button>
                     <b-button @click="rosStop" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="danger">Stop ROS service</b-button>
                 </div>
             </b-col>
-        </b-row>        
+        </b-row>
+        <hr>      
     </b-container>
 </template>
 
@@ -72,16 +74,22 @@ export default {
     },
     methods: {
         rosRestart: function() {
-            let url = 'http://' + this.getIP.ip + ':3000/rosRestart'
-            axios.post(url)
+            let url = 'http://' + this.getIP.ip + ':3000/rosRestart';
+            this.$confirm("Are you sure you want to continue?", "Warning", "warning").then(() => {
+                axios.post(url);
+            });
         },
         rosStart: function() {
-            let url = 'http://' + this.getIP.ip + ':3000/rosStart'
-            axios.post(url)
+            let url = 'http://' + this.getIP.ip + ':3000/rosStart';
+            this.$confirm("Are you sure you want to continue?", "Warning", "warning").then(() => {
+                axios.post(url);
+            });
         },
         rosStop: function() {
-            let url = 'http://' + this.getIP.ip + ':3000/rosStop'
-            axios.post(url)
+            let url = 'http://' + this.getIP.ip + ':3000/rosStop';
+            this.$confirm("Are you sure you want to continue?", "Warning", "warning").then(() => {
+                axios.post(url);
+            });
         },
 
         toggleTerminal: function() {
@@ -127,10 +135,12 @@ export default {
             this.nodes = nodesList;
         },
     },
-    created: function() {
-        this.getTopics();
-        this.getNodes();
-        this.toggleTerminal();
+    mounted: function() {
+        if (this.ifConnected.connected) {
+            this.getTopics();
+            this.getNodes();
+            this.toggleTerminal();
+        }
     }
 }
 </script>

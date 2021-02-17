@@ -21,21 +21,27 @@
 
             <!-- Camera feed -->
             <b-row>
-                <b-col col lg="6">
+                <b-col col lg="12">
                     <h5 class="text-center">Camera feed</h5>
-                </b-col>
-                <b-col col lg="6">
-                    <h5 class="text-center">Depthcloud</h5>
                 </b-col>
             </b-row>
             <b-row>
-                <b-col col lg="6">
+                <b-col class="text-center" col lg="12">
                     <b-img v-if="showCamera" :src="video_src" fluid></b-img><br>
                     <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="!showCamera" variant="info">Show camera feed</b-button>
                     <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="showCamera" variant="info">Hide camera feed</b-button>
                 </b-col>
-                <b-col col lg="6">
-                    <div class="text-center" id="webViewer"></div>
+            </b-row>
+            <br>
+
+            <b-row>
+                <b-col col lg="12">
+                    <h5 class="text-center">Depthcloud</h5>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col class="text-center" col lg="12">
+                    <div id="webViewer"></div>
                     <b-button :disabled="showPointCloud" @click="depthCloud" class="mt-1" variant="info">Show DepthCloud</b-button><br>
                 </b-col>
             </b-row>
@@ -58,11 +64,7 @@ export default {
     data: function () {
         return {
             connected: false,
-            ros: null,
-            ws_address: null,
             video_src: "http://localhost:4000/stream?topic=/camera/color/image_raw&type=ros_compressed",
-            logs: [],
-            loading: false,
             topic: null,
             message: null,
             joystick_manager1: null,
@@ -79,47 +81,16 @@ export default {
     methods: {
         ...mapActions(['setRos', 'setConnect', 'setIP']),
 
-        connect: function () {
-            this.loading = true;
-            console.log("Connect to rosbridge server"); 
-
-            this.ros = new ROSLIB.Ros({
-                url: "ws://" + this.ws_address
-            });
-        
-            this.ros.on("connection", () => {
-                this.connected = true;
-                this.setRos({ros: this.ros})
-                this.setConnect({connected: true});
-                this.setIP({ip: this.ws_address.slice(0, -5)})
-                this.loading = false;
-                console.log("Connected");
-                this.logs.unshift(new Date().toLocaleTimeString("it-IT") + " Connected!");
-            });
-            
-            this.ros.on("error", (error) => {
-                console.log("Error connecting to websocekt server: ", error);
-                this.logs.unshift(new Date().toLocaleTimeString("it-IT") + " Error connecting to websocekt server");
-            });
-            
-            this.ros.on("close", () => {
-                this.connected = false;
-                this.setConnect({connected: false})
-                this.loading = false;
-                console.log("Connection to websocket server closed");
-                this.logs.unshift(new Date().toLocaleTimeString("it-IT") + " Connection to websocket server closed");
-            });
-        },
-        disconnect: function () {
+        /*disconnect: function () {
             this.connected = false;
             this.setConnect({connected: false})
             this.loading = false;
             this.ros.close();
-        },
+        },*/
 
         setTopic: function () {
             this.topic = new ROSLIB.Topic({
-                ros: this.ros,
+                ros: this.getRos.ros,
                 name: "/robotont/cmd_vel",
                 messageType: "geometry_msgs/Twist",
             });
@@ -246,7 +217,7 @@ export default {
 
             var viewer = new ROS3D.Viewer({
                 divID : 'webViewer',
-                width : window.innerWidth / 3,
+                width : window.innerWidth / 2,
                 height : 600,
                 antialias : true,
                 background : '#111111'
@@ -297,14 +268,16 @@ export default {
         },    
     },
 
-    created: function() {
-        this.ws_address = window.location.host.slice(0, -5) + ":9090";
-        this.connect();
+    mounted: function() {
+        if (this.ifConnected.connected) {
+            this.joystick();
+            this.cameraFeed();
+        }
     },
 
     watch: {
-        connected: function () {
-            if (this.connected) {
+        '$store.state.connected': function () {
+            if (this.ifConnected.connected) {
                 this.joystick();
                 this.cameraFeed();
             }
