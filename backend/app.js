@@ -8,7 +8,7 @@ const sh = spawn('bash');
 app.use(cors());
 
 app.post('/shutdown', function (req, res) {
-    exec("sudo poweroff", (error, stdout, stdrr) => {
+    exec("poweroff", (error, stdout, stdrr) => {
         if (error) {
             console.error(`error: ${error.message}`);
         }

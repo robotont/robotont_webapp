@@ -47,12 +47,13 @@ struct pty_proc {
   int status;
   proc_state state;
 
-  int pty;
+  int pty_fd;
   char *pty_buffer;
   ssize_t pty_len;
   int err_count;
 
-  uv_pipe_t pipe;
+  uv_pipe_t *in_pipe;
+  uv_pipe_t *out_pipe;
 
   LIST_ENTRY(pty_proc) entry;
 };
@@ -62,7 +63,7 @@ struct pss_tty {
   int initial_cmd_index;
   bool authenticated;
   char address[50];
-  char path[20];
+  char path[128];
 
   struct lws *wsi;
   char *buffer;

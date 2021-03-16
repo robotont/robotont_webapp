@@ -42,7 +42,7 @@
             <b-row>
                 <b-col class="text-center" col lg="12">
                     <div id="webViewer"></div>
-                    <b-button :disabled="showPointCloud" @click="depthCloud" class="mt-1" variant="info">Show DepthCloud</b-button><br>
+                    <b-button :disabled="showDepthCloud" @click="depthCloud" class="mt-1" variant="info">Show DepthCloud</b-button><br>
                 </b-col>
             </b-row>
             <br>
@@ -70,7 +70,7 @@ export default {
             joystick_manager1: null,
             joystick_manager2: null,
             showCamera: false,
-            showPointCloud: false,
+            showDepthCloud: false,
         }
     },
 
@@ -203,6 +203,7 @@ export default {
         },
         cameraFeed: function() {
             this.video_src = "http://" + this.getIP.ip + ":4000/stream?topic=/camera/color/image_raw&type=ros_compressed"
+
             if (this.showCamera) {
                 this.showCamera = false
             }
@@ -212,12 +213,13 @@ export default {
         },
 
         depthCloud: function() {
+            console.log("easd")
             let url = 'http://' + this.getIP.ip + ':4000/stream?topic=/depthcloud_encoded&type=mjpeg'
-            this.showPointCloud = true;
 
+            this.showDepthCloud = true;
             var viewer = new ROS3D.Viewer({
                 divID : 'webViewer',
-                width : window.innerWidth / 2,
+                width : innerWidth / 2,
                 height : 600,
                 antialias : true,
                 background : '#111111'

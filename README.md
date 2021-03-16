@@ -1,69 +1,29 @@
-# roslibnodejs
+# Robotont Webapp
 
-Install if not installed
+## Install node.js
 
 ```
-sudo apt-get install ros-melodic-web-video-server
-sudo apt-get install ros-melodic-rosbridge-server
-sudo apt-get install ros-melodic-tf2-web-republisher
-sudo apt-get install ros-melodic-depthcloud-encoder 
+curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+```
+```
+sudo apt-get install -y nodejs
 ```
 
-For the web applications full functionality run these
+## Install prerequisites
 ```
-rosrun web_video_server web_video_server _port:=4000
-roslaunch rosbridge_server rosbridge_websocket.launch port:=9090
-rosrun tf2_web_republisher tf2_web_republisher
-rosrun depthcloud_encoder depthcloud_encoder_node _depth:=/camera/depth/image_rect_raw _rgb:=/camera/color/image_raw
+sudo apt-get update
+sudo apt-get install ros-melodic-web-video-server ros-melodic-rosbridge-server ros-melodic-tf2-web-republisher ros-melodic-depthcloud-encoder build-essential cmake libjson-c-dev libwebsockets-dev
 ```
 
 ## Project setup
 
-### Run Frontend
-
-Go to the frontend folder
+Go to the scripts folder and run build.sh
 ```
-cd frontend
+./build.sh
 ```
 
-Run this only on the first launch
+## Launch the web application
 ```
-npm install
-```
-
-To run the frontend
-```
-npm run serve
+roslaunch robotont-webapp webapp.launch
 ```
 
-
-### Run Backend
-
-Go to the backend folder
-```
-cd backend
-```
-
-Run this only on the first launch
-```
-npm install
-```
-
-To run the backend
-```
-npm start
-```
-
-### Run ttyd for web terminal
-
-Go to ttyd build folder
-```
-cd ttyd/build/
-```
-Run the terminal app
-```
-ttyd -p 5000 bash
-````
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

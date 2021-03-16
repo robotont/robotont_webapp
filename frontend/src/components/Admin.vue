@@ -106,9 +106,9 @@ export default {
 
         getTopics: function() {
             var topicsClient = new ROSLIB.Service({
-            ros: this.getRos.ros,
-            name: '/rosapi/topics',
-            serviceType: 'rosapi/Topics'
+                ros: this.getRos.ros,
+                name: '/rosapi/topics',
+                serviceType: 'rosapi/Topics'
             });
 
             var request = new ROSLIB.ServiceRequest();
@@ -121,9 +121,9 @@ export default {
         },
         getNodes: function() {
             var nodesClient = new ROSLIB.Service({
-            ros: this.getRos.ros,
-            name: '/rosapi/nodes',
-            serviceType: 'rosapi/Nodes'
+                ros: this.getRos.ros,
+                name: '/rosapi/nodes',
+                serviceType: 'rosapi/Nodes'
             });
 
             var request = new ROSLIB.ServiceRequest();

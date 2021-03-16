@@ -49,7 +49,13 @@ export default {
         shutdown: function() {
             let ip = this.getIP.ip;
             let url = 'http://' + ip +':3000/shutdown'
-            this.$confirm("Are you sure you want to shutdown the robot?", "Warning", "warning").then(() => {
+            this.$fire({
+                text:"Are you sure you want to shutdown the robot?", 
+                title:"Warning", 
+                type:"warning",
+                showCancelButton: true,
+                showConfirmButton: true,
+            }).then(() => {
                 axios.post(url);
             });
         },
@@ -92,13 +98,28 @@ export default {
     watch: {
         connected: function() {
             if (!this.connected) {
-                this.$alert("Connection to websocket server is lost. Retrying to connect.", "Error", "error").then(() => {
+                /*this.$alert("Connection to websocket server is lost. Retrying to connect.", "Error", "error").then(() => {
                     this.connect();
-                });
+                });*/
+                this.$fire({
+                    text:"Connection to websocket server is lost. Retrying to connect.", 
+                    title:"Error", 
+                    type:"error",
+                    showConfirmButton: true,
+                }).then(() => {
+                    this.connect();
+            });
             }
             else {
-                this.$alert("Connection to websocket server was created.", "Success", "success").then(() => {
-                });
+                /*this.$alert("Connection to websocket server was created.", "Success", "success").then(() => {
+                });*/
+                this.$fire({
+                    text:"Connection to websocket server was created.", 
+                    title:"Success", 
+                    type:"success",
+                    showConfirmButton: true,
+                }).then(() => {});
+                
             }
         }
     }
