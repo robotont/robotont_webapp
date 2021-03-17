@@ -213,7 +213,6 @@ export default {
         },
 
         depthCloud: function() {
-            console.log("easd")
             let url = 'http://' + this.getIP.ip + ':4000/stream?topic=/depthcloud_encoded&type=mjpeg'
 
             this.showDepthCloud = true;
