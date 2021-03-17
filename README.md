@@ -24,6 +24,6 @@ Go to the scripts folder and run build.sh
 
 ## Launch the web application
 ```
-roslaunch robotont-webapp webapp.launch
+roslaunch robotont_webapp webapp.launch
 ```
 
