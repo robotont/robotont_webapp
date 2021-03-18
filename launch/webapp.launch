@@ -8,4 +8,5 @@
   <node name="depthcloud_encoder_node" pkg="depthcloud_encoder" type="depthcloud_encoder_node" args="_depth:=/camera/depth/image_rect_raw _rgb:=/camera/color/image_raw"/>
   <node name="nodejs_app" pkg="robotont_webapp" type="npm_script.sh" output="screen"/>
   <node name="ttyd_terminal" pkg="robotont_webapp" type="ttyd_script.sh" output="screen"/>
+  <node name="depth_image_converter" pkg="robotont_webapp" type="depth_image_converter.py"/>
 </launch>
