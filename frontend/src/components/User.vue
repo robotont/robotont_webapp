@@ -91,7 +91,7 @@ export default {
         setTopic: function () {
             this.topic = new ROSLIB.Topic({
                 ros: this.getRos.ros,
-                name: "/robotont/cmd_vel",
+                name: "/cmd_vel",
                 messageType: "geometry_msgs/Twist",
             });
         },
@@ -246,7 +246,7 @@ export default {
             var urdfClient = new ROS3D.UrdfClient({
                 ros: this.getRos.ros,
                 tfClient: tfClient,
-                path: "http://0.0.0.0:8000/",
+                path: "robotont_description",
                 rootObject: viewer.scene,
                 loader : loader
             });
