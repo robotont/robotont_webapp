@@ -2,13 +2,13 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const { exec, spawn } = require('child_process');
-//const functions = require('./public/javascripts/functions.js');
 const sh = spawn('bash');
+//const serveIndex = require('serve-index');
 
 app.use(cors());
 
 app.post('/shutdown', function (req, res) {
-    exec("poweroff", (error, stdout, stdrr) => {
+    exec("sudo poweroff", (error, stdout, stdrr) => {
         if (error) {
             console.error(`error: ${error.message}`);
         }
@@ -67,6 +67,8 @@ app.post('/rosStop', function (req, res) {
     });
     res.send('Ros stop')
 });
+
+//app.use('/test', express.static('public'), serveIndex('public', {icons: true}));
 
 app.listen(3000, function() {
     console.log("running at port 3000");
