@@ -3,7 +3,9 @@ const app = express();
 const cors = require('cors');
 const { exec, spawn } = require('child_process');
 const sh = spawn('bash');
-//const serveIndex = require('serve-index');
+const serveIndex = require('serve-index');
+const path = require("path");
+const { dir } = require('console');
 
 app.use(cors());
 
@@ -35,7 +37,7 @@ app.post('/rosRestart', function (req, res) {
 
         console.log(`stdout:\n${stdout}`);
     });
-    res.send('Ros restart')
+    res.send('Robotont service restart')
 });
 
 app.post('/rosStart', function (req, res) {
@@ -50,7 +52,7 @@ app.post('/rosStart', function (req, res) {
 
         console.log(`stdout:\n${stdout}`);
     });
-    res.send('Ros start')
+    res.send('Robotont service start')
 });
 
 app.post('/rosStop', function (req, res) {
@@ -65,10 +67,10 @@ app.post('/rosStop', function (req, res) {
 
         console.log(`stdout:\n${stdout}`);
     });
-    res.send('Ros stop')
+    res.send('Robotont service stop')
 });
-
-//app.use('/test', express.static('public'), serveIndex('public', {icons: true}));
+let dirPath = path.join(__dirname, "../../");
+app.use('/files', express.static(dirPath), serveIndex(dirPath, {icons: true}));
 
 app.listen(3000, function() {
     console.log("running at port 3000");

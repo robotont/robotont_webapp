@@ -19,33 +19,18 @@
             <br><br><br><br>
             <hr>
 
-            <!-- Camera feed -->
+            <!-- Camera feed and DepthCloud -->
             <b-row>
-                <b-col col lg="12">
-                    <h5 class="text-center">Camera feed</h5>
+                <b-col class="text-center" col lg="6" fluid>
+                    <h5 class="text-center">Camera feed</h5><br>
+                    <b-img :src="video_src" fluid></b-img><br>
+                </b-col>
+                <b-col class="text-center" col lg="6">
+                    <h5 class="text-center">Depthcloud</h5><br>
+                    <div id="webViewer" fluid></div>
                 </b-col>
             </b-row>
-            <b-row>
-                <b-col class="text-center" col lg="12">
-                    <b-img v-if="showCamera" :src="video_src" fluid></b-img><br>
-                    <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="!showCamera" variant="info">Show camera feed</b-button>
-                    <b-button @click="cameraFeed" :disabled="!ifConnected.connected" class="mt-1" v-if="showCamera" variant="info">Hide camera feed</b-button>
-                </b-col>
-            </b-row>
-            <br>
 
-            <b-row>
-                <b-col col lg="12">
-                    <h5 class="text-center">Depthcloud</h5>
-                </b-col>
-            </b-row>
-            <b-row>
-                <b-col class="text-center" col lg="12">
-                    <div id="webViewer"></div>
-                    <b-button :disabled="showDepthCloud" @click="depthCloud" class="mt-1" variant="info">Show DepthCloud</b-button><br>
-                </b-col>
-            </b-row>
-            <br>
         </b-container>
     </div>
 </template>
@@ -69,8 +54,6 @@ export default {
             message: null,
             joystick_manager1: null,
             joystick_manager2: null,
-            showCamera: false,
-            showDepthCloud: false,
         }
     },
 
@@ -80,13 +63,6 @@ export default {
 
     methods: {
         ...mapActions(['setRos', 'setConnect', 'setIP']),
-
-        /*disconnect: function () {
-            this.connected = false;
-            this.setConnect({connected: false})
-            this.loading = false;
-            this.ros.close();
-        },*/
 
         setTopic: function () {
             this.topic = new ROSLIB.Topic({
@@ -141,6 +117,7 @@ export default {
             var angular_speed = 0;
             var timer1;
             var timer2;
+
             ref.joystick_manager1.on("start", function (event, nipple) {
                 timer1 = setInterval(function () {
                     ref.move(linear_speed_x, linear_speed_y, angular_speed);
@@ -201,29 +178,28 @@ export default {
                 ref.move(linear_speed_x, linear_speed_y, 0);
             });
         },
+
         cameraFeed: function() {
             this.video_src = "http://" + this.getIP.ip + ":4000/stream?topic=/camera/color/image_raw&type=ros_compressed"
-
-            if (this.showCamera) {
-                this.showCamera = false
-            }
-            else {
-                this.showCamera = true;
-            }
         },
 
         depthCloud: function() {
-            let url = 'http://' + this.getIP.ip + ':4000/stream?topic=/depthcloud_encoded&type=mjpeg'
+            var url = 'http://' + this.getIP.ip + ':4000/stream?topic=/depthcloud_encoded&type=mjpeg'
+            var path = 'http://' + this.getIP.ip + ':3000/files/'
+            var width = window.innerWidth / 3.4;
 
-            this.showDepthCloud = true;
             var viewer = new ROS3D.Viewer({
                 divID : 'webViewer',
-                width : innerWidth / 2,
-                height : 600,
+                width : window.innerWidth / 3.3,
+                height : width,
                 antialias : true,
                 background : '#111111'
             });
             viewer.addObject(new ROS3D.Grid())
+
+            if (window.innerWidth < 400) {
+                viewer.resize(window.innerWidth - 50, 410);
+            }
 
             // Setup a client to listen to TFs.
             var tfClient = new ROSLIB.TFClient({
@@ -233,23 +209,25 @@ export default {
                 rate: 10.0,
             });
 
-            /*console.log("Loading mesh resource");
-            const mesh = new ROS3D.MeshResource({
+            /*const mesh = new ROS3D.MeshResource({
                 resource: 'robotont_description/meshes/body.stl',
-                path: 'http://localhost:8000/',
+                path: path,
                 warnings: true
             });
-            console.log("Loaded mesh: ", mesh);*/
+            //console.log("Loaded mesh: ", mesh);*/
             
             var loader = new ColladaLoader();
             // Setup the URDF client
             var urdfClient = new ROS3D.UrdfClient({
                 ros: this.getRos.ros,
                 tfClient: tfClient,
-                path: "robotont_description",
+                path: path,
+                param: "robotont_description",
                 rootObject: viewer.scene,
                 loader : loader
             });
+
+            console.log(urdfClient)
 
             // Setup Camera DepthCloud stream
             var depthCloud = new ROS3D.DepthCloud({
@@ -273,6 +251,7 @@ export default {
         if (this.ifConnected.connected) {
             this.joystick();
             this.cameraFeed();
+            this.depthCloud();
         }
     },
 
@@ -281,6 +260,7 @@ export default {
             if (this.ifConnected.connected) {
                 this.joystick();
                 this.cameraFeed();
+                this.depthCloud();
             }
             else {
                 this.joystick_manager1.destroy();

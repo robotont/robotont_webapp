@@ -9,9 +9,7 @@
         </b-row>
         <b-row>
             <b-col col lg="12">
-                <iframe v-if="isTerminalOpen" :src="terminalUrl" width="100%" height="400" frameborder="0"></iframe>
-                <b-button v-if="!isTerminalOpen" @click="toggleTerminal" size="md" :disabled="!ifConnected.connected" class="btn btn-info">Show terminal</b-button>
-                <b-button v-if="isTerminalOpen" @click="toggleTerminal" size="md" :disabled="!ifConnected.connected" class="btn btn-info">Hide terminal</b-button>
+                <iframe :src="terminalUrl" width="100%" height="400" frameborder="0"></iframe>
             </b-col>
         </b-row>
         <hr>
@@ -44,9 +42,9 @@
             <b-col col lg="12">
                 <h3 class="text-center">ROS service control</h3>
                 <div class="text-center">
-                    <b-button @click="rosRestart" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="success">Restart ROS service</b-button>
-                    <b-button @click="rosStart" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="success">Start ROS service</b-button>
-                    <b-button @click="rosStop" :disabled="!ifConnected.connected" class="mr-2" size="lg" variant="danger">Stop ROS service</b-button>
+                    <b-button @click="rosRestart" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="success">Restart ROS service</b-button>
+                    <b-button @click="rosStart" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="success">Start ROS service</b-button>
+                    <b-button @click="rosStop" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="danger">Stop ROS service</b-button>
                 </div>
             </b-col>
         </b-row>
@@ -63,7 +61,6 @@ export default {
     name: "Admin",
     data: function() {
         return {
-            isTerminalOpen: false,
             topics: [],
             nodes: [],
             terminalUrl: "http://localhost:5000"
@@ -92,16 +89,9 @@ export default {
             });
         },
 
-        toggleTerminal: function() {
+        showTerminal: function() {
             let url = 'http://' + this.getIP.ip + ':5000';
             this.terminalUrl = url;
-
-            if (!this.isTerminalOpen) {
-                this.isTerminalOpen = true;
-            }
-            else {
-                this.isTerminalOpen = false;
-            }
         },
 
         getTopics: function() {
@@ -136,11 +126,9 @@ export default {
         },
     },
     mounted: function() {
-        if (this.ifConnected.connected) {
-            this.getTopics();
-            this.getNodes();
-            this.toggleTerminal();
-        }
+        this.getTopics();
+        this.getNodes();
+        this.showTerminal();
     }
 }
 </script>
