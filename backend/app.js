@@ -69,6 +69,7 @@ app.post('/rosStop', function (req, res) {
     });
     res.send('Robotont service stop')
 });
+
 let dirPath = path.join(__dirname, "../../");
 app.use('/files', express.static(dirPath), serveIndex(dirPath, {icons: true}));
 

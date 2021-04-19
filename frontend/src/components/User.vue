@@ -213,8 +213,8 @@ export default {
                 resource: 'robotont_description/meshes/body.stl',
                 path: path,
                 warnings: true
-            });
-            //console.log("Loaded mesh: ", mesh);*/
+            });*/
+            //console.log("Loaded mesh: ", mesh);
             
             var loader = new ColladaLoader();
             // Setup the URDF client
@@ -222,12 +222,9 @@ export default {
                 ros: this.getRos.ros,
                 tfClient: tfClient,
                 path: path,
-                param: "robotont_description",
                 rootObject: viewer.scene,
                 loader : loader
             });
-
-            console.log(urdfClient)
 
             // Setup Camera DepthCloud stream
             var depthCloud = new ROS3D.DepthCloud({
