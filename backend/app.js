@@ -6,6 +6,7 @@ const sh = spawn('bash');
 const serveIndex = require('serve-index');
 const path = require("path");
 const { dir } = require('console');
+const ip = require("ip");
 
 app.use(cors());
 
@@ -74,6 +75,7 @@ let dirPath = path.join(__dirname, "../../");
 app.use('/files', express.static(dirPath), serveIndex(dirPath, {icons: true}));
 
 app.listen(3000, function() {
+    console.log("Web app running at: " + ip.address() + ":3000")
     console.log("running at port 3000");
 });
 

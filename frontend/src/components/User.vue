@@ -120,7 +120,7 @@ export default {
 
             ref.joystick_manager1.on("start", function (event, nipple) {
                 timer1 = setInterval(function () {
-                    ref.move(linear_speed_x, linear_speed_y, angular_speed);
+                    ref.move(linear_speed_x, linear_speed_y, 0);
                 }, 25);
             });
 
@@ -147,13 +147,13 @@ export default {
                 if (timer1) {
                     clearInterval(timer1);
                 }
-                ref.move(0, 0, angular_speed);
+                ref.move(0, 0, 0);
             });
 
 
             ref.joystick_manager2.on("start", function (event, nipple) {
                 timer2 = setInterval(function () {
-                    ref.move(linear_speed_x, linear_speed_y, angular_speed);
+                    ref.move(0, 0, angular_speed);
                 }, 25);
             });
 
@@ -175,7 +175,7 @@ export default {
                 if (timer2) {
                     clearInterval(timer2);
                 }
-                ref.move(linear_speed_x, linear_speed_y, 0);
+                ref.move(0, 0, 0);
             });
         },
 
