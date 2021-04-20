@@ -39,3 +39,5 @@ ttyd/devel/
 ttyd/gtest/
 ttyd/install_manifest.txt
 
+backend/dist/*
+
