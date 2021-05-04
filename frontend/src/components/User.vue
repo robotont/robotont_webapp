@@ -125,8 +125,8 @@ export default {
             });
 
             ref.joystick_manager1.on("move", function (event, nipple) {
-                var max_linear = 2.0; // m/s
-                var max_angular = 2.0; // rad/s
+                var max_linear = 0.4; // m/s
+                var max_angular = 1.0; // rad/s
                 var max_distance = 75.0; // pixels;
                 linear_speed_x =
                     (Math.sin(nipple.angle.radian) *
@@ -136,7 +136,7 @@ export default {
 
                 linear_speed_y =
                     (-Math.cos(nipple.angle.radian) *
-                        max_angular *
+                        max_linear *
                         nipple.distance) /
                     max_distance;
 
@@ -158,8 +158,8 @@ export default {
             });
 
             ref.joystick_manager2.on("move", function (event, nipple) {
-                var max_linear = 2.0; // m/s
-                var max_angular = 2.0; // rad/s
+                var max_linear = 0.4; // m/s
+                var max_angular = 1.0; // rad/s
                 var max_distance = 75.0; // pixels;
                 linear_speed_x = 0;
                 linear_speed_y = 0;
@@ -221,6 +221,7 @@ export default {
             var urdfClient = new ROS3D.UrdfClient({
                 ros: this.getRos.ros,
                 tfClient: tfClient,
+                param: "robot_description",
                 path: path,
                 rootObject: viewer.scene,
                 loader : loader

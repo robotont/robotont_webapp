@@ -48,13 +48,7 @@ export default {
         shutdown: function() {
             let ip = this.getIP.ip;
             let url = 'http://' + ip +':3000/shutdown'
-            this.$fire({
-                text:"Are you sure you want to shutdown the robot?", 
-                title:"Warning", 
-                type:"warning",
-                showCancelButton: true,
-                showConfirmButton: true,
-            }).then(() => {
+            this.$confirm( "Are you sure you want to shutdown the robot?", "Warning", "warning").then(() => {
                 axios.post(url);
             });
         },
