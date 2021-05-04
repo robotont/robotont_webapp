@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-container fluid="lg">
+        <b-container fluid="sm">
             <br>
             <!-- Joystick controls -->
             <b-row class="text-center">
@@ -19,13 +19,24 @@
             <br><br><br><br>
             <hr>
 
+            <b-row>
+                <b-col class="text-center" col lg="6">
+                    <b-button @click="cameraToggle = !cameraToggle" variant="info">Toggle camera feed</b-button>
+                </b-col>
+                <br>
+                <b-col class="text-center" col lg="6">
+                    <b-button @click="depthcloudToggle = !depthcloudToggle" variant="info">Toggle depthcloud</b-button>
+                </b-col>
+            </b-row>
+            <br>
+
             <!-- Camera feed and DepthCloud -->
             <b-row>
-                <b-col class="text-center" col lg="6" fluid>
+                <b-col v-show="cameraToggle" class="text-center" col lg="6">
                     <h5 class="text-center">Camera feed</h5><br>
                     <b-img :src="video_src" fluid></b-img><br>
                 </b-col>
-                <b-col class="text-center" col lg="6">
+                <b-col v-show="depthcloudToggle" class="text-center" col lg="6">
                     <h5 class="text-center">Depthcloud</h5><br>
                     <div id="webViewer" fluid></div>
                 </b-col>
@@ -54,6 +65,8 @@ export default {
             message: null,
             joystick_manager1: null,
             joystick_manager2: null,
+            cameraToggle: false,
+            depthcloudToggle: false
         }
     },
 
