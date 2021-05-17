@@ -4,7 +4,7 @@
         <!-- Terminal -->
         <b-row>
             <b-col col lg="12">
-                <h3 class="text-center">Terminal</h3>
+                <h3 class="text-center">{{$store.state.currentLang.terminal}}</h3>
             </b-col>
         </b-row>
         <b-row>
@@ -17,22 +17,22 @@
         <!-- Topics and nodes -->
         <b-row>
             <b-col col lg="6">
-                <h3>Topics: </h3>
+                <h3>{{$store.state.currentLang.topics}}: </h3>
                 <div class="lists">
                     <p v-for="topic in topics[0]" v-bind:key="topic">
                         {{ topic }}
                     </p>
                 </div>
-                <b-button @click="getTopics" :disabled="!ifConnected.connected" class="btn btn-info">Refresh</b-button>
+                <b-button @click="getTopics" :disabled="!ifConnected.connected" class="btn btn-info">{{$store.state.currentLang.refresh}}</b-button>
             </b-col>
             <b-col col lg="6">
-                <h3>Nodes: </h3>
+                <h3>{{$store.state.currentLang.nodes}}: </h3>
                 <div class="lists">
                     <p v-for="node in nodes[0]" v-bind:key="node">
                         {{ node }}
                     </p>
                 </div>
-                <b-button @click="getNodes" :disabled="!ifConnected.connected" class="btn btn-info">Refresh</b-button>
+                <b-button @click="getNodes" :disabled="!ifConnected.connected" class="btn btn-info">{{$store.state.currentLang.refresh}}</b-button>
             </b-col>
         </b-row>
         <hr>
@@ -40,11 +40,11 @@
         <!-- Ros service buttons -->
         <b-row>
             <b-col col lg="12">
-                <h3 class="text-center">ROS service control</h3>
+                <h3 class="text-center">{{$store.state.currentLang.service}}</h3>
                 <div class="text-center">
-                    <b-button @click="rosRestart" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="success">Restart ROS service</b-button>
-                    <b-button @click="rosStart" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="success">Start ROS service</b-button>
-                    <b-button @click="rosStop" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="danger">Stop ROS service</b-button>
+                    <b-button @click="rosRestart" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="success">{{$store.state.currentLang.restart}}</b-button>
+                    <b-button @click="rosStart" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="success">{{$store.state.currentLang.start}}</b-button>
+                    <b-button @click="rosStop" :disabled="!ifConnected.connected" class="mr-2 mt-2 mb-2" size="lg" variant="danger">{{$store.state.currentLang.stop}}</b-button>
                 </div>
             </b-col>
         </b-row>
@@ -72,19 +72,19 @@ export default {
     methods: {
         rosRestart: function() {
             let url = 'http://' + this.getIP.ip + ':3000/rosRestart';
-            this.$confirm("Are you sure you want to continue?", "Warning", "warning").then(() => {
+            this.$confirm(this.$store.state.currentLang.confirmation, this.$store.state.currentLang.warning, "warning").then(() => {
                 axios.post(url);
             });
         },
         rosStart: function() {
             let url = 'http://' + this.getIP.ip + ':3000/rosStart';
-            this.$confirm("Are you sure you want to continue?", "Warning", "warning").then(() => {
+            this.$confirm(this.$store.state.currentLang.confirmation, this.$store.state.currentLang.warning, "warning").then(() => {
                 axios.post(url);
             });
         },
         rosStop: function() {
             let url = 'http://' + this.getIP.ip + ':3000/rosStop';
-            this.$confirm("Are you sure you want to continue?", "Warning", "warning").then(() => {
+            this.$confirm(this.$store.state.currentLang.confirmation, this.$store.state.currentLang.warning, "warning").then(() => {
                 axios.post(url);
             });
         },

@@ -4,18 +4,22 @@
         <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
         <b-navbar-brand class="ml-2">Robotont</b-navbar-brand>
         <b-navbar-nav class="ml-auto mr-2">
-            <b-nav-text>Connection:</b-nav-text>
+            <b-nav-text>{{$store.state.currentLang.connection}}:</b-nav-text>
         </b-navbar-nav>
         <b-navbar-nav class="mr-2">
-            <div v-if="!ifConnected.connected" class="dot" style="background-color: red"></div>
-            <div v-if="ifConnected.connected" class="dot" style="background-color: green"></div>
+            <div v-if="!ifConnected.connected" class="dot mr-2" style="background-color: red"></div>
+            <div v-if="ifConnected.connected" class="dot mr-2" style="background-color: green"></div>
+        </b-navbar-nav>
+        <b-navbar-nav>
+            <img @click="changeLang" v-if="$store.state.lang === 'est'" class="lang ml-2" src="./assets/united-kingdom.png" />
+            <img @click="changeLang" v-if="$store.state.lang === 'en'" class="lang ml-2" src="./assets/estonia.png" />
         </b-navbar-nav>
         <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
-                <router-link tag="b-nav-item" to="/">User</router-link>
-                <router-link tag="b-nav-item" to="/admin">Advanced</router-link>
+                <router-link tag="b-nav-item" to="/">{{$store.state.currentLang.user}}</router-link>
+                <router-link tag="b-nav-item" to="/admin">{{$store.state.currentLang.advanced}}</router-link>
             </b-navbar-nav>
-            <b-button @click="shutdown" variant="danger" size="md">Shutdown</b-button>
+            <b-button @click="shutdown" variant="danger" size="md">{{$store.state.currentLang.shutdown}}</b-button><br>
         </b-collapse>
     </b-navbar>
     <router-view />
@@ -39,16 +43,28 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["getIP", "ifConnected", "getRos"])
+        ...mapGetters(["getIP", "ifConnected", "getRos", "getLang"])
     },
 
     methods: {
-        ...mapActions(['setRos', 'setConnect', 'setIP']),
+        ...mapActions(['setRos', 'setConnect', 'setIP', 'setLang', 'setCurrentLang']),
+
+        changeLang: function() {
+            if (this.getLang === "est") {
+                console.log(this.getLang.lang)
+                this.setLang("en");
+                this.setCurrentLang(this.$store.state.locale.en)
+            }
+            else {
+                this.setLang("est");
+                this.setCurrentLang(this.$store.state.locale.est)
+            }
+        },
 
         shutdown: function() {
             let ip = this.getIP.ip;
             let url = 'http://' + ip +':3000/shutdown'
-            this.$confirm( "Are you sure you want to shutdown the robot?", "Warning", "warning").then(() => {
+            this.$confirm( this.$store.state.currentLang.shutdownMsg, this.$store.state.currentLang.warning, "warning").then(() => {
                 axios.post(url);
             });
         },
@@ -84,14 +100,15 @@ export default {
     created: function() {
         this.ws_address = window.location.host.slice(0, -5) + ":9090";
         this.connect();
+        this.setCurrentLang(this.$store.state.locale.est);
     },
 
     watch: {
         connected: function() {
             if (!this.connected) {
                 this.$fire({
-                    text:"Connection to websocket server is lost. Retrying to connect.", 
-                    title:"Error", 
+                    text: this.$store.state.currentLang.connectionError, 
+                    title: this.$store.state.currentLang.error, 
                     type:"error",
                     showConfirmButton: true,
                 }).then(() => {
@@ -100,8 +117,8 @@ export default {
             }
             else {
                 this.$fire({
-                    text:"Connection to websocket server was created.", 
-                    title:"Success", 
+                    text: this.$store.state.currentLang.connectionSuccess, 
+                    title:this.$store.state.currentLang.success, 
                     type:"success",
                     showConfirmButton: true,
                 }).then(() => {});
@@ -119,6 +136,13 @@ export default {
         background-color: #bbb;
         border-radius: 50%;
     }
+
+    .lang {
+        height: 25px;
+        width: 25px;
+        cursor: pointer;
+    }
+
 </style>
 
 

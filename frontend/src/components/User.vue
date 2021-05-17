@@ -5,7 +5,7 @@
             <!-- Joystick controls -->
             <b-row class="text-center">
                 <b-col col lg="12">
-                    <h5>Joystick Controls</h5>
+                    <h5>{{$store.state.currentLang.joysticks}}</h5>
                 </b-col>
             </b-row>
 
@@ -21,11 +21,13 @@
 
             <b-row>
                 <b-col class="text-center" col lg="6">
-                    <b-button @click="cameraToggle = !cameraToggle" variant="info">Toggle camera feed</b-button>
+                    <b-button v-if="!cameraToggle" @click="cameraToggle = !cameraToggle" variant="info">{{$store.state.currentLang.cameraButtonShow}}</b-button>
+                    <b-button v-if="cameraToggle" @click="cameraToggle = !cameraToggle" variant="info">{{$store.state.currentLang.cameraButtonHide}}</b-button>
                 </b-col>
                 <br>
                 <b-col class="text-center" col lg="6">
-                    <b-button @click="depthcloudToggle = !depthcloudToggle" variant="info">Toggle depthcloud</b-button>
+                    <b-button v-if="!depthcloudToggle" @click="depthcloudToggle = !depthcloudToggle" variant="info">{{$store.state.currentLang.depthcloudButtonShow}}</b-button>
+                    <b-button v-if="depthcloudToggle" @click="depthcloudToggle = !depthcloudToggle" variant="info">{{$store.state.currentLang.depthcloudButtonHide}}</b-button>
                 </b-col>
             </b-row>
             <br>
@@ -33,15 +35,14 @@
             <!-- Camera feed and DepthCloud -->
             <b-row>
                 <b-col v-show="cameraToggle" class="text-center" col lg="6">
-                    <h5 class="text-center">Camera feed</h5><br>
+                    <h5 class="text-center">{{$store.state.currentLang.camera}}</h5><br>
                     <b-img :src="video_src" fluid></b-img><br>
                 </b-col>
                 <b-col v-show="depthcloudToggle" class="text-center" col lg="6">
-                    <h5 class="text-center">Depthcloud</h5><br>
+                    <h5 class="text-center">{{$store.state.currentLang.depthcloud}}</h5><br>
                     <div id="webViewer" fluid></div>
                 </b-col>
             </b-row>
-
         </b-container>
     </div>
 </template>
@@ -221,13 +222,6 @@ export default {
                 transThres: 0.01,
                 rate: 10.0,
             });
-
-            /*const mesh = new ROS3D.MeshResource({
-                resource: 'robotont_description/meshes/body.stl',
-                path: path,
-                warnings: true
-            });*/
-            //console.log("Loaded mesh: ", mesh);
             
             var loader = new ColladaLoader();
             // Setup the URDF client
