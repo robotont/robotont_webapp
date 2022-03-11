@@ -98,7 +98,7 @@ export default {
         },
     },
     created: function() {
-        this.ws_address = window.location.host.slice(0, -5) + ":9090";
+        this.ws_address = window.location.hostname + ":9090";
         this.connect();
         this.setCurrentLang(this.$store.state.locale.est);
     },
