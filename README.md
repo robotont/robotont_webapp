@@ -1,6 +1,8 @@
 # Robotont Webapp
 
-## Install node.js
+## Prerequisites
+
+### node.js
 
 ```
 curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
@@ -9,17 +11,30 @@ curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-## Install prerequisites
+### Prerequisites from APT repositories
 ```
 sudo apt-get update
-sudo apt-get install ros-melodic-web-video-server ros-melodic-rosbridge-server ros-melodic-tf2-web-republisher ros-melodic-depthcloud-encoder build-essential cmake libjson-c-dev libwebsockets-dev
+sudo apt-get install ros-noetic-web-video-server ros-noetic-rosbridge-server ros-noetic-tf2-web-republisher build-essential cmake libjson-c-dev libwebsockets-dev
 ```
 
-## Project setup
+### Depthcloud encoder
 
-Go to the scripts folder and run build.sh
+Add depthcloud\_encoder package under the src folder of your catkin workspace
 ```
-./build.sh
+cd ~/catkin_ws/src
+git clone https://github.com/RobotWebTools/depthcloud_encoder.git
+```
+
+### ttyd
+
+Follow the Install instructions on the [ttyd readme](https://github.com/tsl0922/ttyd#install-on-linux).
+
+## Build the package with nodejs backend and frontend
+
+In your catkin workspace run:
+```
+cd ~/catkin_ws
+catkin build
 ```
 
 ## Launch the web application
