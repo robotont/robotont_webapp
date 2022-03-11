@@ -2,20 +2,22 @@
 
 ## Prerequisites
 
-### node.js
-
+### Install prerequisites from APT repositories
 ```
 curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-```
-```
-sudo apt-get install -y nodejs
+sudo apt-get update
+sudo apt-get install -y build-essential cmake git libjson-c-dev libwebsockets-dev ros-noetic-web-video-server ros-noetic-rosbridge-server ros-noetic-tf2-web-republisher nodejs
 ```
 
-### Prerequisites from APT repositories
+### Build & install ttyd (for sharing terminal on the web)
+
 ```
-sudo apt-get update
-sudo apt-get install ros-noetic-web-video-server ros-noetic-rosbridge-server ros-noetic-tf2-web-republisher build-essential cmake libjson-c-dev libwebsockets-dev
+git clone https://github.com/tsl0922/ttyd.git
+cd ttyd && mkdir build && cd build
+cmake ..
+make && sudo make install
 ```
+For further information please see the [ttyd readme](https://github.com/tsl0922/ttyd#install-on-linux).
 
 ### Depthcloud encoder
 
@@ -25,9 +27,6 @@ cd ~/catkin_ws/src
 git clone https://github.com/RobotWebTools/depthcloud_encoder.git
 ```
 
-### ttyd
-
-Follow the Install instructions on the [ttyd readme](https://github.com/tsl0922/ttyd#install-on-linux).
 
 ## Build the package with nodejs backend and frontend
 
