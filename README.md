@@ -41,3 +41,15 @@ catkin build
 roslaunch robotont_webapp webapp.launch
 ```
 
+The website will be available on port 3000 e.g. http://192.168.200.1:3000
+
+## Redirecting port 80
+
+To access the server on port 80, such that no port has to be specified in the addressbar, a redirect firewall rule can be set up with the following commands:
+
+```
+sudo iptables -t nat -A PREROUTING -i wlp58s0 -p tcp --dport 80 -j REDIRECT --to-port 3000
+sudo apt install -y iptables-persistent
+sudo iptables-save | sudo tee /etc/iptables/rules.v4
+```
+You might need to adapt the network interface name (`wlp58s0`) in the above commands to what is present in your robotont. Check with `ip addr` command.
