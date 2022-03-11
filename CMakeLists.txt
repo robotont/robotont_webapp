@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.0.2)
 project(robotont_webapp)
 
 
@@ -13,13 +14,11 @@ find_program(NPM npm)
 if (NOT NPM)
         message(FATAL_ERROR "npm not found! Follow install instructions on https://github.com/robotont/robotont_webapp")
 endif()
-message(${NPM})
 
 find_program(TTYD ttyd)
 if (NOT TTYD)
         message(FATAL_ERROR "ttyd not found! Follow install instructions on: https://github.com/tsl0922/ttyd#install-on-linux")
 endif()
-message(${NPM})
 
 catkin_package()
 
