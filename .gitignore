@@ -22,22 +22,5 @@ pnpm-debug.log*
 *.sln
 *.sw?
 
-frontend/package-lock.json
-
-ttyd/CATKIN_IGNORE
-ttyd/CMakeCache.txt
-ttyd/CMakeFiles/
-ttyd/CTestConfiguration.ini
-ttyd/CTestCustom.cmake
-ttyd/CTestTestfile.cmake
-ttyd/Makefile
-ttyd/atomic_configure/
-ttyd/catkin/
-ttyd/catkin_generated/
-ttyd/cmake_install.cmake
-ttyd/devel/
-ttyd/gtest/
-ttyd/install_manifest.txt
-
 backend/dist/*
 
