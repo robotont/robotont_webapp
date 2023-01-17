@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>robotont_webapp</name>
+  <version>0.0.0</version>
+  <description>The robotont_webapp package</description>
+  <maintainer email="rauno.polluaar@gmail.com">Rauno Põlluäär</maintainer>
+  <license>Apache 2.0</license>
+  <author>Rauno Põlluäär</author>
+
+  <url type="website">https://wiki.ros.org/robotont</url>
+  <url type="website">http://robotont.ut.ee</url>
+  <url type="repository">http://github.com/robotont/robotont_webapp</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>depthcloud_encoder</build_depend>
+  <build_depend>rosbridge_server</build_depend>
+  <build_depend>tf2_web_republisher</build_depend>
+  <build_depend>web_video_server</build_depend>
+  <build_export_depend>depthcloud_encoder</build_export_depend>
+  <build_export_depend>rosbridge_server</build_export_depend>
+  <build_export_depend>tf2_web_republisher</build_export_depend>
+  <build_export_depend>web_video_server</build_export_depend>
+  <exec_depend>depthcloud_encoder</exec_depend>
+  <exec_depend>rosbridge_server</exec_depend>
+  <exec_depend>tf2_web_republisher</exec_depend>
+  <exec_depend>web_video_server</exec_depend>
+
+  <export>
+  </export>
+</package>
