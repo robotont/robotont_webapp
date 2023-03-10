@@ -9,6 +9,13 @@ sudo apt-get update
 sudo apt-get install -y build-essential cmake git libjson-c-dev libwebsockets-dev ros-noetic-web-video-server ros-noetic-rosbridge-server ros-noetic-tf2-web-republisher nodejs
 ```
 
+### Update node version
+
+```
+npm install -g n
+n latest
+```
+
 ### Build & install ttyd (for sharing terminal on the web)
 
 ```
